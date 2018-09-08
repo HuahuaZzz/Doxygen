@@ -20,7 +20,7 @@ struct BOOK {
     char date_name[10];
     int state_book;
 } books[MAXNUM];
-
+aaa
 struct DATA {
     int id;
     char member_name[10];
