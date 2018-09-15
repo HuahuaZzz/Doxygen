@@ -1,9 +1,14 @@
 #include<stdio.h>
+#include<stdbool.h>
+#include<ctype.h>
 #define MAXNUM 256
 #define MEMBER_FILE "member.log"
 #define BOOK_FILE "book.log"
 #define DATA_FILE "data.log"
-
+//¨¾§b§PÂ_¼Æ
+#define CHECKNUMBER 8
+#define CHECKENGLISH 3
+#define PHOTONUM 10
 struct MEMBER {
     int id;
     char member_name[10];
@@ -430,11 +435,94 @@ void saveData(FILE * fp, struct DATA data[])
         }
     }
 }
+//¦r¦ê¨¾§b
+int Checked_arrary_input(char InputText[],int CheckType)
+{
+    int Loop_i,Input_array_count=0,CheckAnswer=0,InputEng=0,InputNum=0,InputSpace=0,InputEmail=0,InputError=0;
+    char Checked_Char;
+    Input_array_count = strlen(InputText);
+    if(Input_array_count >0)
+    {
+        for(Loop_i=0;Loop_i<Input_array_count;Loop_i++)
+        {
+            Checked_Char=InputText[Loop_i];
+            if(isalpha(Checked_Char))
+            {
+                InputEng++;
+            }
+            else if(isdigit(Checked_Char))
+            {
+                InputNum++;
+            }
+            else if(isspace(Checked_Char))
+            {
+                InputSpace++;
+            }
+            else if(Checked_Char==64)
+            {
+                InputEmail++;
+            }
+            else
+            {
+                InputError++;
+            }
+        }
+        switch(CheckType)
+        {
+            case 1:
+                //¦W¤l§PÂ_
+                if(InputEng<CHECKENGLISH || InputNum<CHECKNUMBER || InputEmail>0 ||InputError>0 )
+                {
+                    return CheckAnswer =-1;
+                }
+            break;
 
+            case 2:
+                //¦a§}§PÂ_
+                if(InputEmail>0 || InputError>0)
+                {
+                    return CheckAnswer =-2;
+                }
+            break;
+
+            case 3:
+                //±b¸¹§PÂ_
+                if(InputEng<CHECKENGLISH || InputNum<CHECKNUMBER || InputEmail>0 ||InputError>0)
+                {
+                    return CheckAnswer =-3;
+                }
+            break;
+
+            case 4:
+                //±K½X§PÂ_
+                if(InputEng<CHECKENGLISH || InputNum<CHECKNUMBER || InputEmail>0 ||InputError>0 )
+                {
+                    return CheckAnswer =-4;
+                }
+            break;
+
+            case 5:
+                //¹q¸Ü§PÂ_
+                if(InputNum!=PHOTONUM || InputEmail>0 ||InputError>0)
+                {
+                    return CheckAnswer =-5;
+                }
+            break;
+
+            case 6:
+                //¹q¤l«H½c§PÂ_
+                if(InputEmail != 1)
+                {
+                    return CheckAnswer =-6;
+                }
+            break;
+        }
+    }
+    return CheckAnswer;
+}
 int main()
 {
     FILE *fp;
-
     char user;
     char choice;
     int id;
