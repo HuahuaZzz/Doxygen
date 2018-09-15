@@ -1,85 +1,101 @@
-#include<stdio.h>
-#include<stdbool.h>
-#include<ctype.h>
+#include <stdio.h>
+#include <string.h>
+
 #define MAXNUM 256
 #define MEMBER_FILE "member.log"
 #define BOOK_FILE "book.log"
 #define DATA_FILE "data.log"
+
 //防呆判斷數
+#include<ctype.h>
 #define CHECKNUMBER 8
 #define CHECKENGLISH 3
 #define PHOTONUM 10
-struct MEMBER {
-    int id;
-    char member_name[10];
-    char address_name[50];
-    int age;
-    char phone_name[20];
+
+
+
+struct MEMBER{ //member date struct
+    int id; //索引
+    char member_name[10]; //名子
+    char address_name[50]; //地址
+    char accout_name[20]; //帳號
+    char password_name[20]; //密碼
+    char phone_name[20]; //電話
+    char email_name[30]; //電子信箱
+    int man; // 1:man 0:woman
 } members[MAXNUM];
 
-struct BOOK {
-    int book_id;
-    char book_name[80];
-    char club_name[80];
-    int level;
-    char date_name[10];
-    int state_book;
-} books[MAXNUM];
+struct BOOK{ //book date
+    int book_id; //索引
+    char book_name[80]; //名子
+    char club_name[80]; //類別
+    int level; //等級
+    char date_name[10]; //資料
+    int state_book; //是否已借
+}books[MAXNUM];
 
-struct DATA {
+struct DATA{  //borrowing book date
     int id;
     char member_name[10];
     int book_num;
     int book_id[6];
-} data[MAXNUM];
+}data[MAXNUM];
 
-// 初始化會員資料
-void initMember(struct MEMBER members[])
+void initMember(struct MEMBER members[]) // initialization struct members
 {
     int i;
-    for (i = 0; i < 256; i++) {
-        members[i].id = -1;
+    for (i = 0 ; i < 256 ; i++)
+    {
+        members[i].id = -1 ;
     }
 }
 
-// 初始化書籍資料
-void initBooks(struct BOOK books[])
+
+void initBooks(struct BOOK books[]) // initialization struct books
 {
     int i;
-    for (i = 0; i < 256; i++) {
-        books[i].book_id = -1;
+    for (i = 0 ; i < 256 ; i++)
+    {
+        books[i].book_id = -1 ;
     }
 }
 
-// 初始化借書歸還資料
-void initData(struct DATA data[])
+void initData(struct DATA data[]) // initialization struct data
 {
     int i;
-    for (i = 0; i < 256; i++) {
-        data[i].id = -1;
+    for (i = 0 ; i < 256 ; i++)
+    {
+        data[i].id = -1 ;
     }
 }
+
 
 // 載入會員資料
-void loadMember(FILE * fp, struct MEMBER members[])
+void loadMember(FILE * fp , struct MEMBER members[]) //load member data
 {
+
     int i;
     i = 1;
-    while (fscanf(fp, "%d", &members[i].id) != EOF) {
-        fscanf(fp, "%s", members[i].member_name);
-        fscanf(fp, "%s", members[i].address_name);
-        fscanf(fp, "%d", &members[i].age);
-        fscanf(fp, "%s", members[i].phone_name);
-        i = i + 1;
+    while (fscanf(fp,"%d",&members[i].id) != EOF )
+    {
+        fscanf(fp,"%s",members[i].member_name);
+        fscanf(fp,"%s",members[i].address_name);
+        fscanf(fp,"%s",members[i].accout_name);
+        fscanf(fp,"%s",members[i].password_name);
+        fscanf(fp,"%s",members[i].phone_name);
+        fscanf(fp,"%s",members[i].email_name);
+        fscanf(fp,"%d",&members[i].man);
+        i=i+1;
     }
 }
 
 // 載入書籍資料
-void loadBooks(FILE * fp, struct BOOK books[])
+void loadBooks(FILE * fp,struct BOOK books[]) // load book data
 {
     int i;
     i = 1;
-    while (fscanf(fp, "%d", &books[i].book_id) != EOF) {
+    while ( fscanf(fp, "%d", &books[i].book_id) != EOF)
+    {
         fscanf(fp, "%s", books[i].book_name);
         fscanf(fp, "%s", books[i].club_name);
         fscanf(fp, "%d", &books[i].level);
@@ -89,83 +105,80 @@ void loadBooks(FILE * fp, struct BOOK books[])
     }
 }
 
-// 載入借書紀錄
-void loadData(FILE * fp, struct DATA data[])
+void loadData(FILE * fp , struct DATA data[]) //
 {
-    int i, j;
+
+    int i,j;
     i = 1;
-    while (fscanf(fp, "%d", &data[i].id) != EOF) {
+    while( fscanf(fp,"%d",&data[i].id) != EOF )
+    {
         fscanf(fp, "%d", &data[i].id);
         fscanf(fp, "%s", data[i].member_name);
         fscanf(fp, "%d", &data[i].book_num);
-        for (j = 1; j <= data[i].book_num; j++) {
-            fscanf(fp, "%d", &data[i].book_id[j]);
+        for (j=1 ; j <= data[i].book_num; j++) //判定借了幾本書 要執行幾次
+        {
+            fscanf(fp,"%d",&data[i].book_id[j]); // 抓取 書ID
         }
-        i = i + 1;
+        i = i + 1 ;
     }
-}
-
-// 根據會員ID搜尋借閱紀錄位置
-int searchData(struct DATA data[], int id)
-{
-    int i, index;
-    index = -1;
-    for (i = 1; i < 256; i++) {
-        if (data[i].id == id) {
-            index = i;
-            return index;
-        }
-    }
-    return index;
 }
 
 // 根據書籍ID搜尋該書籍的資料位置
-int searchBooks(struct BOOK books[], int book_id)
+int searchBooks(struct BOOK books[] , int book_id)
 {
-    int i, index;
-    index = -1;
-    for (i = 1; i < 256; i++) {
-        if (books[i].book_id == book_id) {
-            index = i;
-            return index;
+    int i, index ;
+    index = -1 ;
+    for(i = 1 ; i <256 ; i++)
+    {
+        if(books[i].book_id == book_id)
+        {
+            index = i ;
+            return index ;
         }
     }
     return index;
 }
 
 // 搜尋會員的資料位置
-int searchMember(struct MEMBER members[], int id)
+int searchMember(struct MEMBER members[] , int id)
 {
-    int i, index;
-    index = -1;
-    for (i = 1; i < 256; i++) {
-        if (members[i].id == id) {
-            index = i;
-            return index;
+    int i, index ;
+    index = -1 ;
+    for(i = 1 ; i <256 ; i++)
+    {
+        if(members[i].id == id)
+        {
+            index = i ;
+            return index ;
         }
     }
     return index;
 }
 
-// 顯示會員資料
+//顯示會員資料
 void showMember(struct MEMBER members[])
 {
-    int i, counter;
-    counter = 0;
-    printf("已加入的會員=> \n");
-    for (i = 1; i <= 256; i++) {
-        if (members[i].id == -1) {
-            break;
-        }
-        printf("%d ", members[i].id);
+    int i , counter ;
+    counter = 0 ; //計算次數
+    printf("已加入的會員 => \n ");
+    for (i = 1 ; i <= 256 ; i++)
+    {
+        if(members[i].id == -1) {break;}
+        printf("會員編號: %d ",members[i].id);
         printf("\t");
-        printf("%s ", members[i].member_name);
+        printf("會員名稱: %s ", members[i].member_name);
         printf("\t");
-        printf("%s ", members[i].address_name);
+        printf("會員地址: %s ", members[i].address_name);
         printf("\t");
-        printf("%d ", members[i].age);
+        printf("會員帳號: %s ", members[i].accout_name);
         printf("\t");
-        printf("%s ", members[i].phone_name);
+        printf("會員密碼: %s ", members[i].password_name);
+        printf("\t");
+        printf("會員電話: %s ", members[i].phone_name);
+        printf("\t");
+        printf("會員電子信箱: %s ", members[i].email_name);
+        printf("\t");
+        printf("會員性別: %d (0: man 1: woman)", members[i].man);
         printf("\n");
         counter = counter + 1;
     }
@@ -182,17 +195,17 @@ void showBooks(struct BOOK books[])
         if (books[i].book_id == -1) {
             break;
         }
-        printf("%d ", books[i].book_id);
+        printf("書籍編號: %d ", books[i].book_id);
         printf("\t");
-        printf("%s ", books[i].book_name);
+        printf("書籍名稱: %s ", books[i].book_name);
         printf("\t");
-        printf("%s ", books[i].club_name);
+        printf("出版社名稱: %s ", books[i].club_name);
         printf("\t");
-        printf("%d ", books[i].level);
+        printf("書籍分級: %d ", books[i].level);
         printf("\t");
-        printf("%s ", books[i].date_name);
+        printf("書籍進書日期: %s ", books[i].date_name);
         printf("\t");
-        printf("%d ", books[i].state_book);
+        printf("書籍是否被借出: %d ", books[i].state_book);
         printf("\n");
         counter = counter + 1;
     }
@@ -203,12 +216,16 @@ void showBooks(struct BOOK books[])
 void showData(struct DATA data[], int id, int index)
 {
     int i;
+    int county = 0;
     printf("您已借下列書籍:\n");
     for (i = 1; i <= data[index].book_num; i++) {
-        printf("%d ", data[index].book_id[i]);
+        printf("第%d本編號是: %d ", i , data[index].book_id[i]);
+        county = county +1 ;
     }
     printf("\n");
+    printf("共有 %d 本 \n",county);
 }
+
 
 // 新增書籍資料
 int addBooks(struct BOOK books[])
@@ -236,7 +253,7 @@ int addBooks(struct BOOK books[])
             printf("輸入書的分級:");
             scanf("%d", &books[i].level);
             printf("\t");
-            printf("輸入進書日期:");
+            printf("輸入進書日期: ");
             scanf("%s", books[i].date_name);
             printf("\t");
             books[i].state_book = 0;
@@ -246,10 +263,24 @@ int addBooks(struct BOOK books[])
     }
 }
 
+// 根據會員ID搜尋借閱紀錄位置
+int searchData(struct DATA data[], int id)
+{
+    int i, index;
+    index = -1;
+    for (i = 1; i < 256; i++) {
+        if (data[i].id == id) {
+            index = i;
+            return index;
+        }
+    }
+    return index;
+}
+
 // 刪除書籍
 int subBooks(struct BOOK books[], int book_id)
 {
-    int i, j;
+    int i , j;
     for (i = 1; i <= 256; i++) {
         if (books[i].book_id == book_id) {
             if (books[i].state_book == 1) {
@@ -262,34 +293,47 @@ int subBooks(struct BOOK books[], int book_id)
     return 2;
 }
 
+
 // 新增會員
-int addMember(struct MEMBER members[], struct DATA data[])
+int addMember(struct MEMBER members[],struct DATA data[])
 {
-    int i, j;
-    int index;
-    int id;
-    for (i = 1; i < 256; i++) {
-        if (members[i].id == -1) {
+    int i , j ;
+    int index ;
+    int id ;
+    for( i = 1 ; i < 256 ; i ++)
+    {
+        if(members[i].id == -1)
+        {
             printf("\t");
             printf("輸入會員編號:");
             scanf("%d", &id);
             printf("\t");
-            index = searchMember(members, id);
-            if (index != -1) {
-                return 2;
+            index = searchMember(members , id);
+            if (index != -1)
+            {
+                return 2 ;
             }
-            members[i].id = id;
+            members[i].id = id ;
             printf("輸入姓名:");
             scanf("%s", members[i].member_name);
             printf("\t");
             printf("輸入地址:");
             scanf("%s", members[i].address_name);
             printf("\t");
-            printf("輸入年齡:");
-            scanf("%d", &members[i].age);
+            printf("輸入帳號:");
+            scanf("%s", members[i].accout_name);
+            printf("\t");
+            printf("輸入密碼:");
+            scanf("%s", members[i].password_name);
             printf("\t");
             printf("輸入電話:");
             scanf("%s", members[i].phone_name);
+            printf("\t");
+            printf("輸入電子信箱:");
+            scanf("%s", members[i].email_name);
+            printf("\t");
+            printf("輸入性別 0:woman 1: man :");
+            scanf("%d",& members[i].man);
             printf("\t");
 
             for (j = 1; j <= 256; j++) {
@@ -322,6 +366,7 @@ int subMember(struct MEMBER members[], struct DATA data[], int id)
     return 2;
 }
 
+
 // 會員借書
 int addData(struct DATA data[], struct BOOK books[], int book_id, int index)
 {
@@ -329,10 +374,10 @@ int addData(struct DATA data[], struct BOOK books[], int book_id, int index)
     int index1;
     index1 = searchBooks(books, book_id);
     if (books[index1].state_book == 1) {
-        return 5;
+        return 5; //此書已被借走
     }
     if (data[index].book_num == 5) {
-        return 4;
+        return 4; //您的借書額度已滿
     }
     if (book_id >= 1 && book_id < 256) {
         for (i = 1; i <= data[index].book_num; i++) {
@@ -343,9 +388,9 @@ int addData(struct DATA data[], struct BOOK books[], int book_id, int index)
         data[index].book_id[i] = book_id;
         data[index].book_num = data[index].book_num + 1;
         books[index1].state_book = 1;
-        return 1;
+        return 1; //借書完成
     }
-    return 2;
+    return 2; //借書完成
 }
 
 // 會員還書
@@ -363,12 +408,12 @@ int subdata(struct DATA data[], struct BOOK books[], int book_id, int index)
                 data[index].book_id[i] = j;
                 data[index].book_num = data[index].book_num - 1;
                 books[index1].state_book = 0;
-                return 1;
+                return 1;  //還書完成
             }
         }
-        return 3;
+        return 3; //未借此書
     }
-    return 2;
+    return 2; //查無此書
 }
 
 // 儲存會員資料
@@ -383,10 +428,15 @@ void saveMember(FILE * fp, struct MEMBER members[])
             fprintf(fp, "\t");
             fprintf(fp, "%s", members[i].address_name);
             fprintf(fp, "\t");
-            fprintf(fp, "%d", members[i].age);
+            fprintf(fp, "%s", members[i].accout_name);
+            fprintf(fp, "\t");
+            fprintf(fp, "%s", members[i].password_name);
             fprintf(fp, "\t");
             fprintf(fp, "%s", members[i].phone_name);
             fprintf(fp, "\t");
+            fprintf(fp, "%s", members[i].email_name);
+            fprintf(fp, "\t");
+            fprintf(fp, "%d", members[i].man);
             fprintf(fp, "\n");
         }
     }
@@ -435,94 +485,13 @@ void saveData(FILE * fp, struct DATA data[])
         }
     }
 }
-//字串防呆
-int Checked_arrary_input(char InputText[],int CheckType)
-{
-    int Loop_i,Input_array_count=0,CheckAnswer=0,InputEng=0,InputNum=0,InputSpace=0,InputEmail=0,InputError=0;
-    char Checked_Char;
-    Input_array_count = strlen(InputText);
-    if(Input_array_count >0)
-    {
-        for(Loop_i=0;Loop_i<Input_array_count;Loop_i++)
-        {
-            Checked_Char=InputText[Loop_i];
-            if(isalpha(Checked_Char))
-            {
-                InputEng++;
-            }
-            else if(isdigit(Checked_Char))
-            {
-                InputNum++;
-            }
-            else if(isspace(Checked_Char))
-            {
-                InputSpace++;
-            }
-            else if(Checked_Char==64)
-            {
-                InputEmail++;
-            }
-            else
-            {
-                InputError++;
-            }
-        }
-        switch(CheckType)
-        {
-            case 1:
-                //名子判斷
-                if(InputEng<CHECKENGLISH || InputNum<CHECKNUMBER || InputEmail>0 ||InputError>0 )
-                {
-                    return CheckAnswer =-1;
-                }
-            break;
 
-            case 2:
-                //地址判斷
-                if(InputEmail>0 || InputError>0)
-                {
-                    return CheckAnswer =-2;
-                }
-            break;
 
-            case 3:
-                //帳號判斷
-                if(InputEng<CHECKENGLISH || InputNum<CHECKNUMBER || InputEmail>0 ||InputError>0)
-                {
-                    return CheckAnswer =-3;
-                }
-            break;
 
-            case 4:
-                //密碼判斷
-                if(InputEng<CHECKENGLISH || InputNum<CHECKNUMBER || InputEmail>0 ||InputError>0 )
-                {
-                    return CheckAnswer =-4;
-                }
-            break;
-
-            case 5:
-                //電話判斷
-                if(InputNum!=PHOTONUM || InputEmail>0 ||InputError>0)
-                {
-                    return CheckAnswer =-5;
-                }
-            break;
-
-            case 6:
-                //電子信箱判斷
-                if(InputEmail != 1)
-                {
-                    return CheckAnswer =-6;
-                }
-            break;
-        }
-    }
-    return CheckAnswer;
-}
 int main()
 {
-    FILE *fp;
+FILE *fp;
+
     char user;
     char choice;
     int id;
@@ -766,3 +735,98 @@ int main()
         fclose(fp);
     }
 }
+
+
+
+//字串防呆
+int Checked_arrary_input(char InputText[],int CheckType)
+{
+    int Loop_i,Input_array_count=0,CheckAnswer=0,InputEng=0,InputNum=0,InputSpace=0,InputEmail=0,InputError=0;
+    char Checked_Char;
+    Input_array_count = strlen(InputText);
+    if(Input_array_count >0)
+    {
+        for(Loop_i=0;Loop_i<Input_array_count;Loop_i++)
+        {
+            Checked_Char=InputText[Loop_i];
+            if(isalpha(Checked_Char))
+            {
+                InputEng++;
+            }
+            else if(isdigit(Checked_Char))
+            {
+                InputNum++;
+            }
+            else if(isspace(Checked_Char))
+            {
+                InputSpace++;
+            }
+            else if(Checked_Char==64)
+            {
+                InputEmail++;
+            }
+            else
+            {
+                InputError++;
+            }
+        }
+        switch(CheckType)
+        {
+            case 1:
+                //名子判斷
+                if(InputEng<CHECKENGLISH || InputNum<CHECKNUMBER || InputEmail>0 ||InputError>0 )
+                {
+                    return CheckAnswer =-1;
+                }
+            break;
+
+            case 2:
+                //地址判斷
+                if(InputEmail>0 || InputError>0)
+                {
+                    return CheckAnswer =-2;
+                }
+            break;
+
+            case 3:
+                //帳號判斷
+                if(InputEng<CHECKENGLISH || InputNum<CHECKNUMBER || InputEmail>0 ||InputError>0)
+                {
+                    return CheckAnswer =-3;
+                }
+            break;
+
+            case 4:
+                //密碼判斷
+                if(InputEng<CHECKENGLISH || InputNum<CHECKNUMBER || InputEmail>0 ||InputError>0 )
+                {
+                    return CheckAnswer =-4;
+                }
+            break;
+
+            case 5:
+                //電話判斷
+                if(InputNum!=PHOTONUM || InputEmail>0 ||InputError>0)
+                {
+                    return CheckAnswer =-5;
+                }
+            break;
+
+            case 6:
+                //電子信箱判斷
+                if(InputEmail != 1)
+                {
+                    return CheckAnswer =-6;
+                }
+            break;
+        }
+    }
+    return CheckAnswer;
+}
+
+
+
+
+
+
+

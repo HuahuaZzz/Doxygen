@@ -1,0 +1,40 @@
+#include <stdio.h>
+
+struct members 
+{
+    char key[10];
+    char name[10];
+    char account[20];
+    char password[10];
+    char address[30];
+    char telephone[12];
+    char email[20];
+    char power[2];
+};
+
+main()
+{
+    FILE_write();
+    FILE_read();
+}
+
+
+int FILE_write()
+{
+   FILE *fp;
+    struct members add;
+   fp = fopen("test.txt", "w+");
+   printf("enter your date ");
+   scanf("%s %s %s %s %s", add.name ,add.account,add.password,add.telephone,add.email);
+   fprintf(fp, "%s %s %s %s %s", add.name ,add.account,add.password,add.telephone,add.email);
+   fclose(fp);
+}
+
+int FILE_read()
+{
+    FILE *fp;
+    struct members add;
+   fp = fopen("test.txt", "r");
+   fscanf(fp, "%s %s %s %s %s", add.name ,add.account,add.password,add.telephone,add.email);
+   printf("name : %s account :%s password:%s telephone :%s emaill:%s\n", add.name ,add.account,add.password,add.telephone,add.email);
+}
