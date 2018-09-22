@@ -22,7 +22,8 @@ struct MEMBER{ //member date struct
     char password_name[20]; //密碼
     char phone_name[20]; //電話
     char email_name[30]; //電子信箱
-    int man; // 1:man 0:woman
+    char man; // 1:man 0:woman
+    int power; // 權限 0 為一般 1為管理員
 } members[MAXNUM];
 
 struct BOOK{ //book date
@@ -47,6 +48,7 @@ void initMember(struct MEMBER members[]) // initialization struct members
     for (i = 0 ; i < 256 ; i++)
     {
         members[i].id = -1 ;
+        members[i].power = 0 ;
     }
 }
 
@@ -85,6 +87,7 @@ void loadMember(FILE * fp , struct MEMBER members[]) //load member data
         fscanf(fp,"%s",members[i].phone_name);
         fscanf(fp,"%s",members[i].email_name);
         fscanf(fp,"%d",&members[i].man);
+        fscanf(fp,"%d",&members[i].power);
         i=i+1;
     }
 }
@@ -181,7 +184,8 @@ void showMember(struct MEMBER members[])
         printf("\n");
         printf("會員電子信箱: %s ", members[i].email_name);
         printf("\n");
-        printf("會員性別: %d (0: man 1: woman)", members[i].man);
+        printf("會員性別: %c (0: man 1: woman)", members[i].man);
+        printf("會員權限: %d ", members[i].power);
         printf("\n");
         printf("-----------------------------------------");
         printf("\n");
@@ -229,7 +233,13 @@ void showData(struct DATA data[], int id, int index)
     int county = 0;
     printf("您已借下列書籍:\n");
     for (i = 1; i <= data[index].book_num; i++) {
-        printf("第%d本編號是: %d ", i , data[index].book_id[i]);
+        printf("\n");
+        printf("----------------------------------------- \n");
+        printf("第%d本 \n", i );
+        printf("編號是: %d \n",data[index].book_id[i]);
+        printf("書籍名稱: %s \n" , books[index].book_name);
+        printf("----------------------------------------- \n");
+        printf("\n");
         county = county +1 ;
     }
     printf("\n");
@@ -309,7 +319,9 @@ int addMember(struct MEMBER members[],struct DATA data[])
 {
     int i , j ;
     int index ;
+    int index_check = 1;
     int id ;
+    int check_char;
     for( i = 1 ; i < 256 ; i ++)
     {
         if(members[i].id == -1)
@@ -325,27 +337,105 @@ int addMember(struct MEMBER members[],struct DATA data[])
             }
             members[i].id = id ;
             printf("輸入姓名:");
-            scanf("%s", members[i].member_name);
+            while(index_check)
+            {
+                scanf("%s", members[i].member_name);
+                if((check_char = Checked_arrary_input(members[i].member_name,1) ) == 1 )
+                {
+                    index_check = 0;
+                }else
+                {
+                    index_check = 1;
+                    printf("輸入格式錯誤!! (不可含有非法字元) 例: !@#$%^&*()_+=- .. \n") ;
+                    printf("\t 請重新輸入:");
+                }
+            }
+            index_check = 1 ;
             printf("\t");
             printf("輸入地址:");
-            scanf("%s", members[i].address_name);
+            while(index_check)
+            {
+                scanf("%s", members[i].address_name);
+                if((check_char = Checked_arrary_input(members[i].address_name,2) ) == 1 )
+                {
+                    index_check = 0;
+                }else
+                {
+                    index_check = 1;
+                    printf("輸入格式錯誤!! (不可含有非法字元) 例: !@#$%^&*()_+=- .. \n") ;
+                    printf("\t 請重新輸入:");
+                }
+            }
+            index_check = 1 ;
             printf("\t");
             printf("輸入帳號:");
-            scanf("%s", members[i].accout_name);
+            while(index_check)
+            {
+                scanf("%s", members[i].accout_name);
+                if((check_char = Checked_arrary_input(members[i].accout_name,3) ) == 1 )
+                {
+                    index_check = 0;
+                }else
+                {
+                    index_check = 1;
+                    printf("輸入格式錯誤!! (帳號至少要有三個英文八個數字和不能亂碼)\n") ;
+                    printf("\t 請重新輸入:");
+                }
+            }
+            index_check = 1 ;
             printf("\t");
             printf("輸入密碼:");
-            scanf("%s", members[i].password_name);
+            while(index_check)
+            {
+                scanf("%s", members[i].password_name);
+                if((check_char = Checked_arrary_input(members[i].password_name,4) ) == 1 )
+                {
+                    index_check = 0;
+                }else
+                {
+                    index_check = 1;
+                    printf("輸入格式錯誤!! (密碼至少要有三個英文八個數字和不能亂碼)\n") ;
+                    printf("\t 請重新輸入:");
+                }
+            }
+            index_check = 1 ;
             printf("\t");
             printf("輸入電話:");
-            scanf("%s", members[i].phone_name);
+            while(index_check)
+            {
+                scanf("%s", members[i].phone_name);
+                if((check_char = Checked_arrary_input(members[i].phone_name,5) ) == 1 )
+                {
+                    index_check = 0;
+                }else
+                {
+                    index_check = 1;
+                    printf("輸入格式錯誤!! (電話至少要有10位數不能有英文不能亂碼)\n") ;
+                    printf("\t 請重新輸入:");
+                }
+            }
+            index_check = 1 ;
             printf("\t");
             printf("輸入電子信箱:");
-            scanf("%s", members[i].email_name);
+            while(index_check)
+            {
+                scanf("%s", members[i].email_name);
+                if((check_char = Checked_arrary_input(members[i].email_name,6) ) == 1 )
+                {
+                    index_check = 0;
+                }else
+                {
+                    index_check = 1;
+                    printf("輸入格式錯誤!! 請輸入正確的電子信箱格式)\n") ;
+                    printf("\t 請重新輸入:");
+                }
+            }
+            index_check = 1 ;
             printf("\t");
             printf("輸入性別 0:woman 1: man :");
-            scanf("%d",& members[i].man);
-            printf("\t");
+            scanf("%c", members[i].man);
 
+            printf("\t");
             for (j = 1; j <= 256; j++) {
                 if (data[j].id == -1) {
                     data[j].id = members[i].id;
@@ -447,6 +537,8 @@ void saveMember(FILE * fp, struct MEMBER members[])
             fprintf(fp, "%s", members[i].email_name);
             fprintf(fp, "\t");
             fprintf(fp, "%d", members[i].man);
+            fprintf(fp, "\t");
+            fprintf(fp, "%d", members[i].power);
             fprintf(fp, "\n");
         }
     }
@@ -496,7 +588,95 @@ void saveData(FILE * fp, struct DATA data[])
     }
 }
 
+void admin_active()
+{
+    FILE * fp;
+    char user;
+    char choice;
+    int id;
+    int book_id;
+    int index;
+    int result;
+    while (1) {
+                fp = fopen(BOOK_FILE, "w");
+                saveBooks(fp, books);
+                fclose(fp);
+                fp = fopen(MEMBER_FILE, "w");
+                saveMember(fp, members);
+                fclose(fp);
+                fp = fopen(DATA_FILE, "w");
+                saveData(fp, data);
+                fclose(fp);
+                printf("\n");
+                printf("請輸入指令\n");
+                printf("\n1.新增書籍 2.刪除書籍 3.增加會員 4.刪除會員\n\
+5.顯示書籍 6.顯示會員 7.結束>");
+                fflush(stdin);
+                scanf("%c", &choice);
+                switch (choice) {
+                                case '1':
+                    result = addBooks(books);
+                    if (result == 1) {
+                        printf("新增書籍完成\n");
+                    }
+                    if (result == 2) {
+                        printf("已有此書\n");
+                    }
+                    fp = fopen(BOOK_FILE, "w");
+                    saveBooks(fp, books);
+                    fclose(fp);
 
+                    break;
+
+                case '2':
+                    printf("輸入欲刪除的書籍編號:");
+                    scanf("%d", &book_id);
+                    result = subBooks(books, book_id);
+                    if (result == 1) {
+                        printf("刪除書籍完成\n");
+                    }
+                    if (result == 2) {
+                        printf("查無此書\n");
+                    }
+                    if (result == 3) {
+                        printf("此書出借中,無法刪除\n");
+                    }
+                    break;
+
+                case '3':
+                    result = addMember(members, data);
+                    if (result == 1) {
+                        printf("新增會員完成\n");
+                    }
+                    if (result == 2)
+                        printf("已有此會員\n");
+                    break;
+
+                case '4':
+                    printf("請輸入欲刪除的會員編號:");
+                    scanf("%d", &id);
+                    result = subMember(members, data, id);
+                    if (result == 1)
+                        printf("刪除會員完成\n");
+                    if (result == 2)
+                        printf("查無此會員\n");
+                    break;
+
+                case '5':
+                    showBooks(books);
+                    break;
+
+                case '6':
+                    showMember(members);
+                    break;
+
+                case '7':
+                    return 0;
+
+                }
+            }
+            return 0;
+}
 
 int main()
 {
@@ -508,6 +688,8 @@ FILE *fp;
     int book_id;
     int index;
     int result;
+    char accout[20];
+    char password[20];
 
     initMember(members);
     initBooks(books);
@@ -525,7 +707,6 @@ FILE *fp;
     fp = fopen(DATA_FILE, "r");
     loadData(fp, data);
     fclose(fp);
-
     printf("┌────────────────────────┐\n\
 │                                                │\n\
 │【書籍租借系統】                                │\n\
@@ -533,7 +714,7 @@ FILE *fp;
 └────────────────────────┘\n");
 
     while (1) {
-        printf("\n請選擇身分 (A.管理員 B.會員 C.加入新會員 D.結束) >");
+        printf("\n 請選擇要做的動作 ( 1: 新會員註冊 2: 會員登入 ):");
         fflush(stdin);
         scanf("%c", &user);
         switch (user) {
@@ -620,25 +801,43 @@ FILE *fp;
             }
             break;
 
+        case '2':
         case 'B':
         case 'b':
-            printf("請輸入會員編號:");
-            scanf("\r%d", &id);
-            index = searchData(data, id);
-            if (index == -1) {
-                printf("無此會員或是輸入錯誤\n");
-                exit(1);
+            printf("\n");
+
+            printf("請輸入會員帳號:");
+            scanf("\r%s", accout);
+            printf("請輸入會員密碼:");
+            scanf("\r%s", password);
+
+            index = searchUser(members , accout , password);
+            if(index < 0){
+                printf("帳號密碼錯誤 請重新輸入 \n");
+                continue;
             }
+            printf("\n");
+            printf("歡迎 %s 使用此系統 \n" , members[index].member_name);
+            printf("\t");
+            if(members[index].power < 1)
+            {
+                printf("你的權限為 '一般會員' ");
+            }else if(members[index].power = 1)
+            {
+                printf("你的權限為 '管理員' ");
+                admin_active();
+                return 0;
+            }
+
+            printf("\n");
 
             while (1) {
                 fp = fopen(BOOK_FILE, "w");
                 saveBooks(fp, books);
                 fclose(fp);
-
-                showBooks(books);
-                showData(data, id, index);
+                printf("\n");
                 printf("請輸入指令\n");
-                printf("1.借書 2.還書 3.顯示借還書資料 4.結束>");
+                printf("1.我要借書 2.我要還書 3.顯示借還書資料 4. 顯示書庫資料 5.結束>");
                 fflush(stdin);
                 scanf("\r%c", &choice);
                 switch (choice) {
@@ -678,7 +877,8 @@ FILE *fp;
 
                 case '2':
                     if (data[index].book_num == 0) {
-                        printf("未借任何書籍\n");
+                        printf("\n");
+                        printf("目前尚未借任何書籍\n");
                         break;
                     }
                     printf("請輸入欲還書本代號, -1結束還書> ");
@@ -704,16 +904,19 @@ FILE *fp;
                     fclose(fp);
                     break;
 
-                case '3':
+                case '3': //顯示借書
                     showData(data, id, index);
                     break;
-
-                case '4':
+                case '4': //顯示書庫
+                    showBooks(books);
+                    break;
+                case '5':
                     exit(1);
                 }
             }
             break;
 
+        case '1':
         case 'C':
         case 'c':
 
@@ -749,94 +952,118 @@ FILE *fp;
 
 
 //字串防呆
-int Checked_arrary_input(char InputText[],int CheckType)
+int Checked_arrary_input(char InputText[], int CheckType)
 {
-    int Loop_i,Input_array_count=0,CheckAnswer=0,InputEng=0,InputNum=0,InputSpace=0,InputEmail=0,InputError=0;
+    int Loop_i, Input_array_count = 0, CheckAnswer = 1, InputEng = 0, InputNum = 0, InputSpace = 0, InputEmail = 0, InputError = 0,InpChin=0;
     char Checked_Char;
     Input_array_count = strlen(InputText);
-    if(Input_array_count >0)
+    if (Input_array_count > 0)
     {
-        for(Loop_i=0;Loop_i<Input_array_count;Loop_i++)
+        for (Loop_i = 0; Loop_i < Input_array_count; Loop_i++)
         {
-            Checked_Char=InputText[Loop_i];
-            if(isalpha(Checked_Char))
+            Checked_Char = InputText[Loop_i];
+            if (isalpha(Checked_Char))
             {
                 InputEng++;
             }
-            else if(isdigit(Checked_Char))
+            else if (isdigit(Checked_Char))
             {
                 InputNum++;
             }
-            else if(isspace(Checked_Char))
+            else if (isspace(Checked_Char))
             {
                 InputSpace++;
             }
-            else if(Checked_Char==64)
+            else if (Checked_Char == 64)
             {
                 InputEmail++;
             }
-            else
+            else if(ispunct(Checked_Char))
             {
                 InputError++;
             }
+            else
+            {
+                InpChin++;
+            }
         }
-        switch(CheckType)
+        switch (CheckType)
         {
-            case 1:
-                //名子判斷
-                if(InputEng<CHECKENGLISH || InputNum<CHECKNUMBER || InputEmail>0 ||InputError>0 )
-                {
-                    return CheckAnswer =-1;
-                }
+        case 1:
+            //名子判斷
+            if ( InputEmail > 0 || InputError > 0 )//名字不能輸入亂碼
+            {
+                return CheckAnswer = -1;
+            }
             break;
 
-            case 2:
-                //地址判斷
-                if(InputEmail>0 || InputError>0)
-                {
-                    return CheckAnswer =-2;
-                }
+        case 2:
+            //地址判斷
+            if (InputEmail > 0 || InputError > 0)//地址不能有亂碼
+            {
+                return CheckAnswer = -2;
+            }
             break;
 
-            case 3:
-                //帳號判斷
-                if(InputEng<CHECKENGLISH || InputNum<CHECKNUMBER || InputEmail>0 ||InputError>0)
-                {
-                    return CheckAnswer =-3;
-                }
+        case 3:
+            //帳號判斷
+            if (InputEng < CHECKENGLISH || InputNum < CHECKNUMBER || InputEmail > 0 || InputError > 0)//帳號至少要有三個英文八個數字和不能亂碼
+            {
+                return CheckAnswer = -3;
+            }
             break;
 
-            case 4:
-                //密碼判斷
-                if(InputEng<CHECKENGLISH || InputNum<CHECKNUMBER || InputEmail>0 ||InputError>0 )
-                {
-                    return CheckAnswer =-4;
-                }
+        case 4:
+            //密碼判斷
+            if (InputEng < CHECKENGLISH || InputNum < CHECKNUMBER || InputEmail > 0 || InputError > 0 )//密碼至少要有三個英文八個數字和不能亂碼
+            {
+                return CheckAnswer = -4;
+            }
             break;
 
-            case 5:
-                //電話判斷
-                if(InputNum!=PHOTONUM || InputEmail>0 ||InputError>0)
-                {
-                    return CheckAnswer =-5;
-                }
+        case 5:
+            //電話判斷
+            if (InputNum != PHOTONUM || InputEng>0||InputEmail > 0 || InputError > 0)//電話至少要有10位數不能有英文不能亂碼
+            {
+                return CheckAnswer = -5;
+            }
             break;
 
-            case 6:
-                //電子信箱判斷
-                if(InputEmail != 1)
-                {
-                    return CheckAnswer =-6;
-                }
+        case 6:
+            //電子信箱判斷
+            if (InputEmail != 1)//不能有少於或多於一個@
+            {
+                return CheckAnswer = -6;
+            }
+            break;
+        case 7:
+            //性別判定
+            if(!(InputText =="1" || InputText=="0"))//不是1就是0
+            {
+                return CheckAnswer =-7;
+            }
             break;
         }
     }
     return CheckAnswer;
 }
 
-
-
-
-
-
+//判斷是不是有這個帳號密碼 不是回傳-1 是回傳大於1的值;
+int searchUser(struct MEMBER members[], char name[], char Pwd[])
+{
+ int i, index;
+ index = -1;
+ for (i = 1; i < 256; i++)
+ {
+  if (strcmp(members[i].accout_name, name) == 0 && strcmp(members[i].password_name, Pwd) == 0 )
+  {
+   if (Checked_arrary_input(name, 3) && Checked_arrary_input(Pwd, 4))
+   {
+    index = i;
+    return index;
+   }
+  }
+ }
+ return index;
+}
 
