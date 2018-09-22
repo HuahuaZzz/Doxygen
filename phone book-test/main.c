@@ -164,21 +164,26 @@ void showMember(struct MEMBER members[])
     for (i = 1 ; i <= 256 ; i++)
     {
         if(members[i].id == -1) {break;}
+        printf("\n");
+        printf("-----------------第 %d 筆----------------" , i);
+        printf("\n");
         printf("會員編號: %d ",members[i].id);
-        printf("\t");
+        printf("\n");
         printf("會員名稱: %s ", members[i].member_name);
-        printf("\t");
+        printf("\n");
         printf("會員地址: %s ", members[i].address_name);
-        printf("\t");
+        printf("\n");
         printf("會員帳號: %s ", members[i].accout_name);
-        printf("\t");
+        printf("\n");
         printf("會員密碼: %s ", members[i].password_name);
-        printf("\t");
+        printf("\n");
         printf("會員電話: %s ", members[i].phone_name);
-        printf("\t");
+        printf("\n");
         printf("會員電子信箱: %s ", members[i].email_name);
-        printf("\t");
+        printf("\n");
         printf("會員性別: %d (0: man 1: woman)", members[i].man);
+        printf("\n");
+        printf("-----------------------------------------");
         printf("\n");
         counter = counter + 1;
     }
@@ -190,22 +195,27 @@ void showBooks(struct BOOK books[])
 {
     int i, counter;
     counter = 0;
-    printf("已擁有的書籍=> \n");
+    printf("書庫資料: => \n");
     for (i = 1; i <= 256; i++) {
         if (books[i].book_id == -1) {
             break;
         }
+        printf("\n");
+        printf("-----------------第 %d 筆----------------" , i);
+        printf("\n");
         printf("書籍編號: %d ", books[i].book_id);
-        printf("\t");
+        printf("\n");
         printf("書籍名稱: %s ", books[i].book_name);
-        printf("\t");
+        printf("\n");
         printf("出版社名稱: %s ", books[i].club_name);
-        printf("\t");
+        printf("\n");
         printf("書籍分級: %d ", books[i].level);
-        printf("\t");
+        printf("\n");
         printf("書籍進書日期: %s ", books[i].date_name);
-        printf("\t");
-        printf("書籍是否被借出: %d ", books[i].state_book);
+        printf("\n");
+        printf("書籍以被借出數量: %d ", books[i].state_book);
+        printf("\n");
+        printf("-----------------------------------------");
         printf("\n");
         counter = counter + 1;
     }
