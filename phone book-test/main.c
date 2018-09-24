@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-
+#include <time.h>
 #define MAXNUM 256
 #define MEMBER_FILE "member.log"
 #define BOOK_FILE "book.log"
@@ -14,7 +14,7 @@
 
 
 
-struct MEMBER{ //member date struct
+struct MEMBER { //member date struct
     int id; //索引
     char member_name[10]; //名子
     char address_name[50]; //地址
@@ -22,25 +22,27 @@ struct MEMBER{ //member date struct
     char password_name[20]; //密碼
     char phone_name[20]; //電話
     char email_name[30]; //電子信箱
-    char man; // 1:man 0:woman
+    int man; // 1:man 0:woman
     int power; // 權限 0 為一般 1為管理員
 } members[MAXNUM];
 
-struct BOOK{ //book date
+struct BOOK { //book date
     int book_id; //索引
     char book_name[80]; //名子
     char club_name[80]; //類別
     int level; //等級
     char date_name[10]; //資料
     int state_book; //是否已借
-}books[MAXNUM];
+    char BorrowDay[10];
+    char DeadLineDay[10];
+} books[MAXNUM];
 
-struct DATA{  //borrowing book date
+struct DATA { //borrowing book date
     int id;
     char member_name[10];
     int book_num;
     int book_id[6];
-}data[MAXNUM];
+} data[MAXNUM];
 
 void initMember(struct MEMBER members[]) // initialization struct members
 {
@@ -78,22 +80,22 @@ void loadMember(FILE * fp , struct MEMBER members[]) //load member data
 
     int i;
     i = 1;
-    while (fscanf(fp,"%d",&members[i].id) != EOF )
+    while (fscanf(fp, "%d", &members[i].id) != EOF )
     {
-        fscanf(fp,"%s",members[i].member_name);
-        fscanf(fp,"%s",members[i].address_name);
-        fscanf(fp,"%s",members[i].accout_name);
-        fscanf(fp,"%s",members[i].password_name);
-        fscanf(fp,"%s",members[i].phone_name);
-        fscanf(fp,"%s",members[i].email_name);
-        fscanf(fp,"%d",&members[i].man);
-        fscanf(fp,"%d",&members[i].power);
-        i=i+1;
+        fscanf(fp, "%s", members[i].member_name);
+        fscanf(fp, "%s", members[i].address_name);
+        fscanf(fp, "%s", members[i].accout_name);
+        fscanf(fp, "%s", members[i].password_name);
+        fscanf(fp, "%s", members[i].phone_name);
+        fscanf(fp, "%s", members[i].email_name);
+        fscanf(fp, "%d", &members[i].man);
+        fscanf(fp, "%d", &members[i].power);
+        i = i + 1;
     }
 }
 
 // 載入書籍資料
-void loadBooks(FILE * fp,struct BOOK books[]) // load book data
+void loadBooks(FILE * fp, struct BOOK books[]) // load book data
 {
     int i;
     i = 1;
@@ -104,6 +106,8 @@ void loadBooks(FILE * fp,struct BOOK books[]) // load book data
         fscanf(fp, "%d", &books[i].level);
         fscanf(fp, "%s", books[i].date_name);
         fscanf(fp, "%d", &books[i].state_book);
+        fscanf(fp, "%s", books[i].BorrowDay);
+        fscanf(fp, "%s", books[i].DeadLineDay);
         i = i + 1;
     }
 }
@@ -111,16 +115,16 @@ void loadBooks(FILE * fp,struct BOOK books[]) // load book data
 void loadData(FILE * fp , struct DATA data[]) //
 {
 
-    int i,j;
+    int i, j;
     i = 1;
-    while( fscanf(fp,"%d",&data[i].id) != EOF )
+    while ( fscanf(fp, "%d", &data[i].id) != EOF )
     {
         fscanf(fp, "%d", &data[i].id);
         fscanf(fp, "%s", data[i].member_name);
         fscanf(fp, "%d", &data[i].book_num);
-        for (j=1 ; j <= data[i].book_num; j++) //判定借了幾本書 要執行幾次
+        for (j = 1 ; j <= data[i].book_num; j++) //判定借了幾本書 要執行幾次
         {
-            fscanf(fp,"%d",&data[i].book_id[j]); // 抓取 書ID
+            fscanf(fp, "%d", &data[i].book_id[j]); // 抓取 書ID
         }
         i = i + 1 ;
     }
@@ -131,9 +135,9 @@ int searchBooks(struct BOOK books[] , int book_id)
 {
     int i, index ;
     index = -1 ;
-    for(i = 1 ; i <256 ; i++)
+    for (i = 1 ; i < 256 ; i++)
     {
-        if(books[i].book_id == book_id)
+        if (books[i].book_id == book_id)
         {
             index = i ;
             return index ;
@@ -147,9 +151,9 @@ int searchMember(struct MEMBER members[] , int id)
 {
     int i, index ;
     index = -1 ;
-    for(i = 1 ; i <256 ; i++)
+    for (i = 1 ; i < 256 ; i++)
     {
-        if(members[i].id == id)
+        if (members[i].id == id)
         {
             index = i ;
             return index ;
@@ -166,11 +170,11 @@ void showMember(struct MEMBER members[])
     printf("已加入的會員 => \n ");
     for (i = 1 ; i <= 256 ; i++)
     {
-        if(members[i].id == -1) {break;}
+        if (members[i].id == -1) {break;}
         printf("\n");
         printf("-----------------第 %d 筆----------------" , i);
         printf("\n");
-        printf("會員編號: %d ",members[i].id);
+        printf("會員編號: %d ", members[i].id);
         printf("\n");
         printf("會員名稱: %s ", members[i].member_name);
         printf("\n");
@@ -184,7 +188,8 @@ void showMember(struct MEMBER members[])
         printf("\n");
         printf("會員電子信箱: %s ", members[i].email_name);
         printf("\n");
-        printf("會員性別: %c (0: man 1: woman)", members[i].man);
+        printf("會員性別: %d (0: man 1: woman)", members[i].man);
+        printf("\n");
         printf("會員權限: %d ", members[i].power);
         printf("\n");
         printf("-----------------------------------------");
@@ -217,6 +222,11 @@ void showBooks(struct BOOK books[])
         printf("\n");
         printf("書籍進書日期: %s ", books[i].date_name);
         printf("\n");
+        if(strlen(books[i].BorrowDay)>0)
+        {
+            printf("借書日期: %s \n",  books[i].BorrowDay);
+            printf("到期日期: %s \n",  books[i].DeadLineDay);
+        }
         printf("書籍以被借出數量: %d ", books[i].state_book);
         printf("\n");
         printf("-----------------------------------------");
@@ -225,32 +235,35 @@ void showBooks(struct BOOK books[])
     }
     printf("共%d筆資料\n", counter);
 }
-
-// 顯示借書歸還資料
+//顯示借閱紀錄
 void showData(struct DATA data[], int id, int index)
 {
-    int i;
+    int i, j;
     int county = 0;
     printf("您已借下列書籍:\n");
     for (i = 1; i <= data[index].book_num; i++) {
         printf("\n");
         printf("----------------------------------------- \n");
         printf("第%d本 \n", i );
-        printf("編號是: %d \n",data[index].book_id[i]);
+        printf("編號是: %d \n", data[index].book_id[i]);
         for (j = 1; j <= 256; j++) {
             if (books[j].book_id == data[index].book_id[i]) {
                 printf("書籍名稱: %s \n" , books[j].book_name);
-                break;
+                if(strlen(books[j].BorrowDay)>0)
+                {
+                    printf("借書日期: %s \n", books[j].BorrowDay);
+                    printf("到期日期: %s \n", books[j].DeadLineDay);
+                    printf("剩餘借用時間: %d 天\n", CheckDeadLine(books[j].DeadLineDay));
+                }
             }
         }
         printf("----------------------------------------- \n");
         printf("\n");
-        county = county +1 ;
+        county = county + 1 ;
     }
     printf("\n");
-    printf("共有 %d 本 \n",county);
+    printf("共有 %d 本 \n", county);
 }
-
 
 // 新增書籍資料
 int addBooks(struct BOOK books[])
@@ -282,6 +295,10 @@ int addBooks(struct BOOK books[])
             scanf("%s", books[i].date_name);
             printf("\t");
             books[i].state_book = 0;
+            printf("\t");
+            books[i].BorrowDay;
+            printf("\t");
+            books[i].DeadLineDay;
             printf("\t");
             return 1;
         }
@@ -320,16 +337,16 @@ int subBooks(struct BOOK books[], int book_id)
 
 
 // 新增會員
-int addMember(struct MEMBER members[],struct DATA data[])
+int addMember(struct MEMBER members[], struct DATA data[])
 {
     int i , j ;
     int index ;
     int index_check = 1;
     int id ;
     int check_char;
-    for( i = 1 ; i < 256 ; i ++)
+    for ( i = 1 ; i < 256 ; i ++)
     {
-        if(members[i].id == -1)
+        if (members[i].id == -1)
         {
             printf("\t");
             printf("輸入會員編號:");
@@ -342,13 +359,13 @@ int addMember(struct MEMBER members[],struct DATA data[])
             }
             members[i].id = id ;
             printf("輸入姓名:");
-            while(index_check)
+            while (index_check)
             {
                 scanf("%s", members[i].member_name);
-                if((check_char = Checked_arrary_input(members[i].member_name,1) ) == 1 )
+                if ((check_char = Checked_arrary_input(members[i].member_name, 1) ) == 1 )
                 {
                     index_check = 0;
-                }else
+                } else
                 {
                     index_check = 1;
                     printf("輸入格式錯誤!! (不可含有非法字元) 例: !@#$%^&*()_+=- .. \n") ;
@@ -358,13 +375,13 @@ int addMember(struct MEMBER members[],struct DATA data[])
             index_check = 1 ;
             printf("\t");
             printf("輸入地址:");
-            while(index_check)
+            while (index_check)
             {
                 scanf("%s", members[i].address_name);
-                if((check_char = Checked_arrary_input(members[i].address_name,2) ) == 1 )
+                if ((check_char = Checked_arrary_input(members[i].address_name, 2) ) == 1 )
                 {
                     index_check = 0;
-                }else
+                } else
                 {
                     index_check = 1;
                     printf("輸入格式錯誤!! (不可含有非法字元) 例: !@#$%^&*()_+=- .. \n") ;
@@ -374,13 +391,13 @@ int addMember(struct MEMBER members[],struct DATA data[])
             index_check = 1 ;
             printf("\t");
             printf("輸入帳號:");
-            while(index_check)
+            while (index_check)
             {
                 scanf("%s", members[i].accout_name);
-                if((check_char = Checked_arrary_input(members[i].accout_name,3) ) == 1 )
+                if ((check_char = Checked_arrary_input(members[i].accout_name, 3) ) == 1 )
                 {
                     index_check = 0;
-                }else
+                } else
                 {
                     index_check = 1;
                     printf("輸入格式錯誤!! (帳號至少要有三個英文八個數字和不能亂碼)\n") ;
@@ -390,13 +407,13 @@ int addMember(struct MEMBER members[],struct DATA data[])
             index_check = 1 ;
             printf("\t");
             printf("輸入密碼:");
-            while(index_check)
+            while (index_check)
             {
                 scanf("%s", members[i].password_name);
-                if((check_char = Checked_arrary_input(members[i].password_name,4) ) == 1 )
+                if ((check_char = Checked_arrary_input(members[i].password_name, 4) ) == 1 )
                 {
                     index_check = 0;
-                }else
+                } else
                 {
                     index_check = 1;
                     printf("輸入格式錯誤!! (密碼至少要有三個英文八個數字和不能亂碼)\n") ;
@@ -406,13 +423,13 @@ int addMember(struct MEMBER members[],struct DATA data[])
             index_check = 1 ;
             printf("\t");
             printf("輸入電話:");
-            while(index_check)
+            while (index_check)
             {
                 scanf("%s", members[i].phone_name);
-                if((check_char = Checked_arrary_input(members[i].phone_name,5) ) == 1 )
+                if ((check_char = Checked_arrary_input(members[i].phone_name, 5) ) == 1 )
                 {
                     index_check = 0;
-                }else
+                } else
                 {
                     index_check = 1;
                     printf("輸入格式錯誤!! (電話至少要有10位數不能有英文不能亂碼)\n") ;
@@ -422,13 +439,13 @@ int addMember(struct MEMBER members[],struct DATA data[])
             index_check = 1 ;
             printf("\t");
             printf("輸入電子信箱:");
-            while(index_check)
+            while (index_check)
             {
                 scanf("%s", members[i].email_name);
-                if((check_char = Checked_arrary_input(members[i].email_name,6) ) == 1 )
+                if ((check_char = Checked_arrary_input(members[i].email_name, 6) ) == 1 )
                 {
                     index_check = 0;
-                }else
+                } else
                 {
                     index_check = 1;
                     printf("輸入格式錯誤!! 請輸入正確的電子信箱格式)\n") ;
@@ -438,8 +455,21 @@ int addMember(struct MEMBER members[],struct DATA data[])
             index_check = 1 ;
             printf("\t");
             printf("輸入性別 0:woman 1: man :");
-            scanf("%c", members[i].man);
 
+            while (index_check)
+            {
+                fflush(stdin);
+                scanf("%d", &members[i].man);
+                if (members[i].man == 0 || members[i].man == 1)
+                {
+                    index_check = 0;
+                }
+                else
+                {
+                    index_check = 1;
+                    printf("輸入錯誤請重新輸入");
+                }
+            }
             printf("\t");
             for (j = 1; j <= 256; j++) {
                 if (data[j].id == -1) {
@@ -475,9 +505,23 @@ int subMember(struct MEMBER members[], struct DATA data[], int id)
 // 會員借書
 int addData(struct DATA data[], struct BOOK books[], int book_id, int index)
 {
-    int i;
+    int i, j, k;
     int index1;
     index1 = searchBooks(books, book_id);
+    if(data[index].book_num>0)
+    {
+        for (k = 1; k <= data[index].book_num; k++) {
+            for (j = 1; j <= 256; j++) {
+                if (books[j].book_id == data[index].book_id[k]) {
+                    if (CheckDeadLine(books[j].DeadLineDay) < 0)
+                    {
+                        printf("書籍名稱: %s 已過期尚未歸還 \n" , books[j].book_name);
+                        return 6;//有過期的書籍沒有還
+                    }
+                }
+            }
+        }
+    }
     if (books[index1].state_book == 1) {
         return 5; //此書已被借走
     }
@@ -493,6 +537,8 @@ int addData(struct DATA data[], struct BOOK books[], int book_id, int index)
         data[index].book_id[i] = book_id;
         data[index].book_num = data[index].book_num + 1;
         books[index1].state_book = 1;
+        //將借用日期及到期日期寫入books
+        GetTimer(books[index1].BorrowDay, books[index1].DeadLineDay);
         return 1; //借書完成
     }
     return 2; //借書完成
@@ -513,6 +559,8 @@ int subdata(struct DATA data[], struct BOOK books[], int book_id, int index)
                 data[index].book_id[i] = j;
                 data[index].book_num = data[index].book_num - 1;
                 books[index1].state_book = 0;
+                strcpy(books[index1].BorrowDay, "");
+                strcpy(books[index1].DeadLineDay, "");
                 return 1;  //還書完成
             }
         }
@@ -567,6 +615,13 @@ void saveBooks(FILE * fp, struct BOOK books[])
             fprintf(fp, "\t");
             fprintf(fp, "%d", books[i].state_book);
             fprintf(fp, "\t");
+            if(strlen(books[i].BorrowDay)>0)
+            {
+            fprintf(fp, "%s", books[i].BorrowDay);
+            fprintf(fp, "\t");
+            fprintf(fp, "%s", books[i].DeadLineDay);
+            fprintf(fp, "\t");
+            }
             fprintf(fp, "\n");
         }
     }
@@ -603,89 +658,89 @@ void admin_active()
     int index;
     int result;
     while (1) {
-                fp = fopen(BOOK_FILE, "w");
-                saveBooks(fp, books);
-                fclose(fp);
-                fp = fopen(MEMBER_FILE, "w");
-                saveMember(fp, members);
-                fclose(fp);
-                fp = fopen(DATA_FILE, "w");
-                saveData(fp, data);
-                fclose(fp);
-                printf("\n");
-                printf("請輸入指令\n");
-                printf("\n1.新增書籍 2.刪除書籍 3.增加會員 4.刪除會員\n\
+        fp = fopen(BOOK_FILE, "w");
+        saveBooks(fp, books);
+        fclose(fp);
+        fp = fopen(MEMBER_FILE, "w");
+        saveMember(fp, members);
+        fclose(fp);
+        fp = fopen(DATA_FILE, "w");
+        saveData(fp, data);
+        fclose(fp);
+        printf("\n");
+        printf("請輸入指令\n");
+        printf("\n1.新增書籍 2.刪除書籍 3.增加會員 4.刪除會員\n\
 5.顯示書籍 6.顯示會員 7.結束>");
-                fflush(stdin);
-                scanf("%c", &choice);
-                switch (choice) {
-                                case '1':
-                    result = addBooks(books);
-                    if (result == 1) {
-                        printf("新增書籍完成\n");
-                    }
-                    if (result == 2) {
-                        printf("已有此書\n");
-                    }
-                    fp = fopen(BOOK_FILE, "w");
-                    saveBooks(fp, books);
-                    fclose(fp);
-
-                    break;
-
-                case '2':
-                    printf("輸入欲刪除的書籍編號:");
-                    scanf("%d", &book_id);
-                    result = subBooks(books, book_id);
-                    if (result == 1) {
-                        printf("刪除書籍完成\n");
-                    }
-                    if (result == 2) {
-                        printf("查無此書\n");
-                    }
-                    if (result == 3) {
-                        printf("此書出借中,無法刪除\n");
-                    }
-                    break;
-
-                case '3':
-                    result = addMember(members, data);
-                    if (result == 1) {
-                        printf("新增會員完成\n");
-                    }
-                    if (result == 2)
-                        printf("已有此會員\n");
-                    break;
-
-                case '4':
-                    printf("請輸入欲刪除的會員編號:");
-                    scanf("%d", &id);
-                    result = subMember(members, data, id);
-                    if (result == 1)
-                        printf("刪除會員完成\n");
-                    if (result == 2)
-                        printf("查無此會員\n");
-                    break;
-
-                case '5':
-                    showBooks(books);
-                    break;
-
-                case '6':
-                    showMember(members);
-                    break;
-
-                case '7':
-                    return 0;
-
-                }
+        fflush(stdin);
+        scanf("%c", &choice);
+        switch (choice) {
+        case '1':
+            result = addBooks(books);
+            if (result == 1) {
+                printf("新增書籍完成\n");
             }
+            if (result == 2) {
+                printf("已有此書\n");
+            }
+            fp = fopen(BOOK_FILE, "w");
+            saveBooks(fp, books);
+            fclose(fp);
+
+            break;
+
+        case '2':
+            printf("輸入欲刪除的書籍編號:");
+            scanf("%d", &book_id);
+            result = subBooks(books, book_id);
+            if (result == 1) {
+                printf("刪除書籍完成\n");
+            }
+            if (result == 2) {
+                printf("查無此書\n");
+            }
+            if (result == 3) {
+                printf("此書出借中,無法刪除\n");
+            }
+            break;
+
+        case '3':
+            result = addMember(members, data);
+            if (result == 1) {
+                printf("新增會員完成\n");
+            }
+            if (result == 2)
+                printf("已有此會員\n");
+            break;
+
+        case '4':
+            printf("請輸入欲刪除的會員編號:");
+            scanf("%d", &id);
+            result = subMember(members, data, id);
+            if (result == 1)
+                printf("刪除會員完成\n");
+            if (result == 2)
+                printf("查無此會員\n");
+            break;
+
+        case '5':
+            showBooks(books);
+            break;
+
+        case '6':
+            showMember(members);
+            break;
+
+        case '7':
             return 0;
+
+        }
+    }
+    return 0;
 }
 
 int main()
 {
-FILE *fp;
+    FILE *fp;
 
     char user;
     char choice;
@@ -817,17 +872,17 @@ FILE *fp;
             scanf("\r%s", password);
 
             index = searchUser(members , accout , password);
-            if(index < 0){
+            if (index < 0) {
                 printf("帳號密碼錯誤 請重新輸入 \n");
                 continue;
             }
             printf("\n");
             printf("歡迎 %s 使用此系統 \n" , members[index].member_name);
             printf("\t");
-            if(members[index].power < 1)
+            if (members[index].power < 1)
             {
                 printf("你的權限為 '一般會員' ");
-            }else if(members[index].power = 1)
+            } else if (members[index].power == 1)
             {
                 printf("你的權限為 '管理員' ");
                 admin_active();
@@ -856,7 +911,6 @@ FILE *fp;
                         break;  // 離開借書的迴圈
                     }
                     result = addData(data, books, book_id, index);
-
                     switch (result) {
                     case 1:
                         printf("借書完成\n");
@@ -873,9 +927,11 @@ FILE *fp;
                     case 5:
                         printf("此書已被借走\n");
                         break;
+                    case 6:
+                        break;
                     }
-
                     fp = fopen(DATA_FILE, "w");
+                    printf("查看 %d Addid %d\n",index,data[index].id );
                     saveData(fp, data);
                     fclose(fp);
                     break;
@@ -959,7 +1015,7 @@ FILE *fp;
 //字串防呆
 int Checked_arrary_input(char InputText[], int CheckType)
 {
-    int Loop_i, Input_array_count = 0, CheckAnswer = 1, InputEng = 0, InputNum = 0, InputSpace = 0, InputEmail = 0, InputError = 0,InpChin=0;
+    int Loop_i, Input_array_count = 0, CheckAnswer = 1, InputEng = 0, InputNum = 0, InputSpace = 0, InputEmail = 0, InputError = 0, InpChin = 0;
     char Checked_Char;
     Input_array_count = strlen(InputText);
     if (Input_array_count > 0)
@@ -983,7 +1039,7 @@ int Checked_arrary_input(char InputText[], int CheckType)
             {
                 InputEmail++;
             }
-            else if(ispunct(Checked_Char))
+            else if (ispunct(Checked_Char))
             {
                 InputError++;
             }
@@ -1028,7 +1084,7 @@ int Checked_arrary_input(char InputText[], int CheckType)
 
         case 5:
             //電話判斷
-            if (InputNum != PHOTONUM || InputEng>0||InputEmail > 0 || InputError > 0)//電話至少要有10位數不能有英文不能亂碼
+            if (InputNum != PHOTONUM || InputEng > 0 || InputEmail > 0 || InputError > 0) //電話至少要有10位數不能有英文不能亂碼
             {
                 return CheckAnswer = -5;
             }
@@ -1043,9 +1099,9 @@ int Checked_arrary_input(char InputText[], int CheckType)
             break;
         case 7:
             //性別判定
-            if(!(InputText =="1" || InputText=="0"))//不是1就是0
+            if (!(InputText == "1" || InputText == "0")) //不是1就是0
             {
-                return CheckAnswer =-7;
+                return CheckAnswer = -7;
             }
             break;
         }
@@ -1056,18 +1112,202 @@ int Checked_arrary_input(char InputText[], int CheckType)
 //判斷是不是有這個帳號密碼 不是回傳-1 是回傳大於1的值;
 int searchUser(struct MEMBER members[], char name[], char Pwd[])
 {
- int i, index;
- index = -1;
- for (i = 1; i < 256; i++)
- {
-  if (strcmp(members[i].accout_name, name) == 0 && strcmp(members[i].password_name, Pwd) == 0 )
-  {
-   if (Checked_arrary_input(name, 3) && Checked_arrary_input(Pwd, 4))
-   {
-    index = i;
+    int i, index;
+    index = -1;
+    for (i = 1; i < 256; i++)
+    {
+        if (strcmp(members[i].accout_name, name) == 0 && strcmp(members[i].password_name, Pwd) == 0 )
+        {
+            if (Checked_arrary_input(name, 3) && Checked_arrary_input(Pwd, 4))
+            {
+                index = i;
+                return index;
+            }
+        }
+    }
     return index;
-   }
-  }
- }
- return index;
+}
+//將表上的bookDeadLine丟入此函式
+int CheckDeadLine(char DatatTime[])
+{
+    int i;
+    int loop_i = 0;
+    char CheckDataTime[10] = "";
+    char Year[4], Month[2], Day[2];
+    char *delim = "-";
+    char * pch;
+    char Timer[10], DeadLine[10];
+    int NowYear = 0, NowMonth = 0, NowDay = 0, DeadYear = 0, DeadMonth = 0, DeadDay = 0;
+    time_t now;
+    struct tm* timenow;
+    time(&now);  //time()會將從1900年開始計算的秒數存入 now 這個結構體.
+    timenow = localtime(&now); //將 now結構體轉化為本地時間
+    NowYear = (int)(timenow->tm_year + 1900);
+    NowMonth = timenow->tm_mon + 1;
+    NowDay = timenow->tm_mday;
+    strcpy(CheckDataTime, DatatTime);
+    pch = strtok(CheckDataTime, delim);
+    while (pch != NULL)
+    {
+        loop_i++;
+        switch (loop_i)
+        {
+        case 1:
+            strcpy(Year, pch);
+            DeadYear = atoi(Year);
+            break;
+        case 2:
+            strcpy(Month, pch);
+            DeadMonth = atoi(Month);
+            break;
+        case 3:
+            strcpy(Day, pch);
+            DeadDay = atoi(Day);
+            break;
+        }
+        pch = strtok (NULL, delim);
+    }
+    if (DeadYear == NowYear)
+    {
+        if (DeadMonth == NowMonth)
+        {
+            return (DeadDay - NowMonth);
+        }
+        else
+        {
+            switch (DeadMonth)
+            {
+            case 2:
+                return (DeadDay + 31 - NowDay);
+                break;
+            case 3:
+                return (DeadDay + 28 - NowDay);
+                break;
+            case 4:
+                return (DeadDay + 31 - NowDay);
+                break;
+            case 5:
+                return (DeadDay + 30 - NowDay);
+                break;
+            case 6:
+                return (DeadDay + 31 - NowDay);
+                break;
+            case 7:
+                return (DeadDay + 30 - NowDay);
+                break;
+            case 8:
+                return (DeadDay + 31 - NowDay);
+                break;
+            case 9:
+                return (DeadDay + 31 - NowDay);
+                break;
+            case 10:
+                return (DeadDay + 30 - NowDay);
+                break;
+            case 11:
+                return (DeadDay + 31 - NowDay);
+                break;
+            case 12:
+                return (DeadDay + 30 - NowDay);
+                break;
+            }
+        }
+    }
+    else
+    {
+        if (DeadMonth < NowMonth)
+        {
+            return (DeadDay + 31 - NowDay);
+        }
+    }
+}
+//丟現在的值同時回傳過期日期與修改樹輸入的現在的日期
+void GetTimer(char DataTime[], char DeadLine[])
+{
+    char Timer[10];
+    int StrYear = 0, StrMoonth = 0, StrDay = 0;
+    time_t now;
+    struct tm* timenow;
+    time(&now);  //time()會將從1900年開始計算的秒數存入 now 這個結構體.
+    timenow = localtime(&now); //將 now結構體轉化為本地時間
+    StrYear = timenow->tm_year + 1900;
+    StrMoonth = timenow->tm_mon + 1;
+    StrDay = timenow->tm_mday;
+    int2str(StrYear, Timer);
+    strcat(DataTime, Timer );
+    strcat(DataTime, "-");
+    int2str(StrMoonth, Timer);
+    strcat(DataTime, Timer );
+    strcat(DataTime, "-");
+    int2str(StrDay, Timer);
+    strcat(DataTime, Timer );
+    if (StrMoonth != 12)
+    {
+        StrYear = timenow->tm_year + 1900;
+        StrMoonth = timenow->tm_mon + 2;
+        StrDay = timenow->tm_mday;
+        switch (StrMoonth)
+        {
+        case 1:
+            if (StrDay == 31)
+            {
+                StrMoonth += 1;
+                StrDay = 3;
+            }
+            break;
+        case 3:
+            if (StrDay == 31)
+            {
+                StrMoonth += 1;
+                StrDay = 1;
+            }
+            break;
+        case 5:
+            if (StrDay == 31)
+            {
+                StrMoonth += 1;
+                StrDay = 1;
+            }
+            break;
+        case 8:
+            if (StrDay == 31)
+            {
+                StrMoonth += 1;
+                StrDay = 1;
+            }
+            break;
+        case 10:
+            if (StrDay == 31)
+            {
+                StrMoonth += 1;
+                StrDay = 1;
+            }
+            break;
+        }
+        int2str(StrYear, Timer);
+        strcat(DeadLine, Timer );
+        strcat(DeadLine, "-");
+        int2str(StrMoonth, Timer);
+        strcat(DeadLine, Timer );
+        strcat(DeadLine, "-");
+        int2str(StrDay, Timer);
+        strcat(DeadLine, Timer );
+    }
+    else
+    {
+        StrYear = timenow->tm_year + 1901;
+        StrMoonth = 1;
+        StrDay = timenow->tm_mday;
+        int2str(StrYear, Timer);
+        strcat(DeadLine, Timer );
+        strcat(DeadLine, "-");
+        int2str(StrMoonth, Timer);
+        strcat(DeadLine, Timer );
+        strcat(DeadLine, "-");
+        int2str(StrDay, Timer);
+        strcat(DeadLine, Timer );
+    }
+}
+void int2str(int i, char *s) {
+    sprintf(s, "%d", i);
 }
