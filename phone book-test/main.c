@@ -931,7 +931,6 @@ int main()
                         break;
                     }
                     fp = fopen(DATA_FILE, "w");
-                    printf("¬d¬Ý %d Addid %d\n",index,data[index].id );
                     saveData(fp, data);
                     fclose(fp);
                     break;
