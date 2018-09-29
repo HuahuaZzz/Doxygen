@@ -206,7 +206,7 @@ void showBooks(struct BOOK books[])
     counter = 0;
     printf("®Ñ®w¸ê®Æ: => \n");
     for (i = 1; i <= 256; i++) {
-        if (books[i].book_id == -1) {
+        if (books[i].book_id == -1 || books[i].book_id == -256) {
             break;
         }
         printf("\n");
@@ -602,7 +602,7 @@ void saveBooks(FILE * fp, struct BOOK books[])
 {
     int i;
     for (i = 1; i < 256; i++) {
-        if (books[i].book_id != -1) {
+        if (books[i].book_id != -1 && books[i].book_id != -256) {
             fprintf(fp, "%d", books[i].book_id);
             fprintf(fp, "\t");
             fprintf(fp, "%s", books[i].book_name);
